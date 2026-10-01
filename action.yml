@@ -1,5 +1,5 @@
 name: "Reliastra Dependency Check"
-description: "Independently observe an external API dependency, confirm failures deterministically, and fail your CI with evidence instead of guesswork."
+description: "Fail your CI when a dependency is actually down. Independent observation, deterministic confirmation, evidence."
 author: "Emmanuel Adeshina <e.adeshina@proton.me>"
 
 branding:
