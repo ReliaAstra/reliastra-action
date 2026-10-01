@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reliastra social preview 1280x640</title>
+<style>
+  /* GitHub renders a social preview at roughly 1280x640. This file is the
+     reproducible source for .github/social-preview.png; regenerate with
+     assets/render-social-preview.md and re-upload in repo settings.
+
+     Palette matches src/render/theme.js so the preview, the runner log and the
+     job summary read as one system. */
+  :root{
+    --bg:#080b11;
+    --bg-2:#0d1219;
+    --line:#1c2532;
+    --cyan:#22d3ee;
+    --cyan-dim:#0e7490;
+    --white:#e8eef7;
+    --gray:#8b97a8;
+    --gray-dim:#5a6675;
+    --land:#3c4a5f;
+    --red:#ef6b73;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1280px;height:640px;overflow:hidden}
+  body{
+    background:
+      radial-gradient(1100px 620px at 18% -12%, #12303d 0%, transparent 62%),
+      radial-gradient(900px 560px at 104% 116%, #141d2b 0%, transparent 58%),
+      var(--bg);
+    font-family:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
+    color:var(--white);
+    position:relative;
+  }
+  /* Fine grid: reads as instrumentation, not decoration. */
+  body::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.021) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.021) 1px,transparent 1px);
+    background-size:48px 48px;
+    pointer-events:none;
+  }
+  .wrap{position:relative;padding:64px 72px 0;height:640px;display:flex;flex-direction:column}
+
+  .row{display:flex;align-items:center;gap:16px}
+  .dotmark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(140deg,var(--cyan),var(--cyan-dim));
+    display:grid;place-items:center;
+    box-shadow:0 0 0 1px rgba(34,211,238,.28), 0 8px 30px -10px rgba(34,211,238,.55);
+  }
+  .dotmark span{color:#06222a;font-size:19px;font-weight:700;line-height:1}
+  h1{font-size:40px;letter-spacing:.20em;font-weight:700;line-height:1}
+  .pill{
+    margin-left:2px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cyan);border:1px solid rgba(34,211,238,.34);
+    padding:5px 12px;border-radius:999px;background:rgba(34,211,238,.06);
+  }
+
+  .tag{margin-top:24px;font-size:26.5px;line-height:1.42;letter-spacing:-.005em;max-width:1140px}
+  .tag b{color:var(--cyan);font-weight:600}
+  .tag .q{color:var(--gray)}
+
+  .rule{height:1px;background:linear-gradient(90deg,var(--line),transparent);margin:26px 0 0}
+
+  /* The real product output, typeset rather than screenshotted. */
+  .panel{
+    margin-top:24px;display:grid;grid-template-columns:344px 1fr;gap:20px;
+    align-items:center;
+  }
+  .lines{font-size:14.5px;line-height:1.72}
+  .kv{display:flex;gap:16px}
+  .k{color:var(--gray-dim);min-width:132px}
+  .v{color:var(--white)}
+  .v.bad{color:var(--red)}
+  .v.cy{color:var(--cyan)}
+
+  .mapwrap{display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .map{
+    font-size:12.1px;line-height:1.13;color:var(--land);white-space:pre;
+    letter-spacing:.6px;
+  }
+  .map .m{color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.9)}
+  .map .cap{
+    display:block;margin-top:16px;font-size:12.5px;line-height:1.5;
+    color:var(--gray-dim);letter-spacing:.2px;text-align:center;
+  }
+
+  .foot{
+    margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;
+    padding-bottom:40px;
+  }
+  .brand{font-size:16px;color:var(--gray);letter-spacing:.06em}
+  .brand b{color:var(--white);font-weight:600}
+  .cta{
+    display:flex;align-items:center;gap:10px;font-size:14px;color:var(--gray);
+  }
+  .cta code{
+    color:var(--cyan);background:rgba(34,211,238,.09);
+    border:1px solid rgba(34,211,238,.22);padding:6px 11px;border-radius:7px;font-size:13px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="row">
+    <div class="dotmark"><span>R</span></div>
+    <h1>RELIASTRA</h1>
+    <span class="pill">GitHub Action</span>
+  </div>
+
+  <p class="tag">
+    Your API failed. <b>Was the dependency actually down?</b><br>
+    <span class="q">Independent observation, deterministic confirmation, verifiable evidence.</span>
+  </p>
+
+  <div class="rule"></div>
+
+  <div class="panel">
+    <div class="lines">
+      <div class="kv"><span class="k">Observation</span><span class="v bad">&#10006; DOWN</span></div>
+      <div class="kv"><span class="k">Dependency</span><span class="v">Stripe Payments API</span></div>
+      <div class="kv"><span class="k">HTTP status</span><span class="v bad">503</span></div>
+      <div class="kv"><span class="k">Latency</span><span class="v">4.18 s</span></div>
+      <div class="kv"><span class="k">Observed</span><span class="v">2026-10-01 17:42:18 UTC</span></div>
+      <div class="kv"><span class="k">Observation pt</span><span class="v cy">&#9679; us-east</span></div>
+      <div class="kv"><span class="k">Incident</span><span class="v">CONFIRMED</span></div>
+      <div class="kv"><span class="k">Exit code</span><span class="v bad">5</span></div>
+    </div>
+
+    <div class="mapwrap">
+      <div class="map">            &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;   &#183;&#183;&#183;&#183;&#183;    &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+    &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;&#183;&#183;      &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+    &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183; &#183;&#183;       &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+          &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;      &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+           &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;<span class="m">&#9679;</span>&#183;         &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+            &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;          &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;&#183;
+              &#183;&#183;&#183; &#183;&#183;&#183;         &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;   &#183;&#183;&#183;&#183;&#183;&#183;&#183;
+                &#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;         &#183;&#183;&#183;&#183;
+                 &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;      &#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;
+                 &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;       &#183;&#183;&#183;&#183;&#183;          &#183;&#183;&#183;&#183;&#183;&#183;
+                  &#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;          &#183;&#183;&#183;&#183;&#183;&#183;
+                  &#183;&#183;&#183;&#183;&#183;         &#183;&#183;&#183;&#183;            &#183;&#183;&#183;&#183;&#183;&#183;
+                  &#183;&#183;&#183;&#183;                                     &#183;&#183;
+                  &#183;&#183;
+<span class="cap">1 observation point. A region label is not corroboration.</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="brand"><b>reliastra.com</b> &nbsp;&#183;&nbsp; fail your CI with evidence, not guesswork</div>
+    <div class="cta">uses: ReliaAstra/reliastra-action<code>@v1</code></div>
+  </div>
+
+</div>
+</body>
+</html>
