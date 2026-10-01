@@ -1,0 +1,51 @@
+name: Missing integration
+description: A platform, provider, language, or workflow shape you need and the action does not support yet.
+title: "[integration] <what you need>"
+labels: ["integration", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reliastra covers a specific set of vendors and one observation point. If something
+        you depend on is missing, that is a legitimate request — but please check the
+        [observatory](https://reliastra.com/observatory) first, because a missing
+        *dependency* and a missing *vendor catalog entry* are different problems.
+
+  - type: dropdown
+    id: gap-type
+    attributes:
+      label: What kind of gap is this?
+      options:
+        - A vendor is missing from the public catalog
+        - A language or framework has no example
+        - A CI platform other than GitHub Actions
+        - A workflow shape (matrix, monorepo, reusable workflow)
+        - An output or field you need that is not exposed
+        - A provider-specific target the API accepts but this action cannot express
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: What specifically?
+      placeholder: e.g. the Datadog status endpoint, or a Go module example
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What are you trying to do?
+      description: The concrete job, not the abstract wish.
+      placeholder: |
+        I want my Go service's CI to fail when Cloudflare has a confirmed public incident.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What are you doing instead?
+      description: An honest workaround tells us whether this is worth building.

@@ -1,0 +1,96 @@
+name: Bug or false observation
+description: Reliastra reported something that did not match reality. This is the most valuable report you can file.
+title: "[observation] <what it reported> vs <what actually happened>"
+labels: ["bug", "observation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **The most valuable bug report is a mismatch between Reliastra's conclusion and
+        what actually happened.** A green tick during a real outage is a serious defect.
+        A failure for a service that was fine is a serious defect. Both start here.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What did Reliastra report, and what actually happened?
+      description: Be specific about the disagreement. Include times.
+      placeholder: |
+        Reliastra reported: DOWN at 2026-10-01 17:42 UTC
+        Actually: our requests to Stripe were succeeding throughout
+    validations:
+      required: true
+
+  - type: dropdown
+    id: verdict-reported
+    attributes:
+      label: Which verdict did the action report?
+      options:
+        - up
+        - degraded
+        - down
+        - blocked
+        - unverified
+        - pipeline-error
+        - "I used exit code, not a verdict"
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs
+    attributes:
+      label: The exact step configuration
+      description: Inputs with secrets redacted. Keep the shape, drop the values.
+      render: yaml
+      placeholder: |
+        - uses: ReliaAstra/reliastra-action@v1
+          with:
+            dependency: 4c1f9e2a-3b7d-4c8e-9f1a-2b3c4d5e6f70
+            fail-on: degraded
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: The rendered output or job summary
+      description: Copy it from the run. The caveat line matters as much as the verdict.
+      render: text
+
+  - type: input
+    id: action-version
+    attributes:
+      label: Action version or commit
+      placeholder: v1
+    validations:
+      required: true
+
+  - type: input
+    id: runner
+    attributes:
+      label: Runner
+      placeholder: ubuntu-latest, macos-14, windows-latest
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node version, if you know it
+      placeholder: node20
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - authenticated (token supplied)
+        - public (no token)
+    validations:
+      required: true
+
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Independent evidence about the target's real state
+      description: Status page, your own metrics, an upstream thread. Anything not derived from Reliastra.

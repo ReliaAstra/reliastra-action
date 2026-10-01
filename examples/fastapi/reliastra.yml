@@ -1,0 +1,43 @@
+name: FastAPI service CI
+
+# A FastAPI service that calls Stripe. The CI step is the point: before this
+# service ships, it checks whether the dependency it relies on is independently
+# observed as failing.
+#
+# The service itself is in `app/`. Nothing in it knows Reliastra exists.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Test and verify the upstream dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Test
+        run: pytest -q
+
+      - name: Reliastra dependency check
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: stripe
+          token: ${{ secrets.RELIASTRA_TOKEN }}
+          # 1200ms is this service's own budget: the p95 SLO in app/config.py.
+          # Deriving the gate from your SLO rather than a round number is what
+          # makes it worth having.
+          fail-on: degraded,down
+          latency-threshold-ms: 1200

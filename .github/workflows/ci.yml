@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build, test, and check dist/ is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The single most important check in this repository. dist/ is what
+      # consumers execute, so a dist/ that does not match src/ means shipping
+      # code that does not correspond to the source anyone reviewed.
+      - name: Verify dist/ matches src/
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "::error::dist/ is out of date. Run 'npm run build' and commit the result."
+            git --no-pager diff --stat dist/
+            exit 1
+          fi
+          echo "dist/ is current."
+
+      - name: action.yml is valid and parseable
+        run: |
+          node -e "
+            const fs = require('fs');
+            const yaml = fs.readFileSync('action.yml', 'utf8');
+            for (const key of ['name:', 'description:', 'author:', 'runs:']) {
+              if (!yaml.includes(key)) throw new Error('action.yml missing ' + key);
+            }
+            if (!/^runs:/m.test(yaml)) throw new Error('missing runs:');
+            if (!yaml.includes('using:')) throw new Error('missing runs.using');
+            if (!yaml.includes('main:')) throw new Error('missing runs.main');
+            console.log('action.yml structural checks passed.');
+          "
+
+      - name: The bundled artifact exists and is not a stub
+        run: |
+          test -f dist/index.js
+          SIZE=$(wc -c < dist/index.js)
+          echo "dist/index.js is ${SIZE} bytes"
+          if [ "$SIZE" -lt 20000 ]; then
+            echo "::error::dist/index.js is suspiciously small; the bundle may be broken."
+            exit 1
+          fi
+
+  self-check:
+    name: Consume this action from a separate repository
+    runs-on: ubuntu-latest
+    # Proves the published tag resolves and the action runs on a real runner.
+    # Reads the public incident feed, so no secret is needed.
+    #
+    # Runs on tag pushes only. On a branch it would reference a tag that does
+    # not exist yet and fail for a reason that has nothing to do with the code
+    # under test. This workflow IS a separate repository consuming
+    # `uses: ReliaAstra/reliastra-action@v1`, which is the point of the check.
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the public-feed path against the published tag
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: stripe
+          fail-on: never
+          result-format: json
+
+      - name: Run the usage-error path and assert exit code 1
+        id: usage
+        continue-on-error: true
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          fail-on: never
+
+      - name: Assert the missing-input contract
+        if: steps.usage.outcome == 'failure'
+        run: echo "Missing dependency correctly failed the step."

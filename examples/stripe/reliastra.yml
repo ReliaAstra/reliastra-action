@@ -1,0 +1,52 @@
+name: Gate a deploy on a Stripe incident
+
+# Two things beyond the basic example:
+#   1. The gate runs BEFORE the deploy, so a confirmed vendor incident stops a
+#      release instead of being noticed in production.
+#   2. The machine-readable record is uploaded as a build artifact, so a
+#      post-incident review can see exactly what was known at gate time.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Verify Stripe before deploying
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reliastra dependency check
+        id: reliastra
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: stripe
+          fail-on: down
+          incident-status: open
+          output-file: reliastra.json
+
+      - name: Archive the observation record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliastra-stripe
+          # 14 days: long enough to compare a bad deploy against what was
+          # independently known at the time.
+          retention-days: 14
+          path: reliastra.json
+
+      - name: Fail loudly if the gate tripped
+        if: steps.reliastra.outputs.matched != ''
+        run: |
+          echo "::error title=Deploy blocked::Reliastra matched gate condition(s): ${{ steps.reliastra.outputs.matched }}"
+          echo "Incident: ${{ steps.reliastra.outputs.incident-id }}"
+          echo "Evidence: ${{ steps.reliastra.outputs.evidence-url }}"
+          exit 1
+
+      - name: Deploy
+        run: ./deploy.sh

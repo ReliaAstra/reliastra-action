@@ -1,0 +1,44 @@
+name: Node service CI
+
+# The same idea in Node. `latency-threshold-ms` is read from the service's own
+# config so the SLO has one home.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Test and verify the upstream dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Read the latency budget from source
+        id: budget
+        run: |
+          MS=$(grep -oE 'LATENCY_BUDGET_MS = [0-9]+' src/config.js | grep -oE '[0-9]+')
+          echo "ms=$MS" >> "$GITHUB_OUTPUT"
+          echo "Latency budget is ${MS}ms"
+
+      - name: Reliastra dependency check
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: cloudflare
+          token: ${{ secrets.RELIASTRA_TOKEN }}
+          fail-on: degraded,down
+          latency-threshold-ms: ${{ steps.budget.outputs.ms }}

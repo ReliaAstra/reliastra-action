@@ -1,0 +1,53 @@
+name: Feature request
+description: A capability this action does not have yet.
+title: "[feature] <what you want to be able to do>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This action is deliberately thin. It reads an observation, renders it, and exits with
+        a documented code. Anything that would make it a second Reliastra belongs in the
+        [main repository](https://github.com/ReliaAstra/Reliastra) instead.
+
+        Requests that keep it thin are the easiest to accept: an input, an output, a gate
+        condition, a rendering improvement.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      options:
+        - A new input
+        - A new output
+        - A new fail-on condition
+        - Rendering or summary layout
+        - A new workflow shape (matrix, reusable workflow)
+        - Packaging (Docker, composite)
+        - Local or self-hosted usage
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What can you not do today?
+      description: Start from the limitation, not the solution.
+      placeholder: |
+        I cannot fail a matrix job per-dependency because I only get the first observation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like?
+      description: YAML is ideal. If you have written the step you want, paste it.
+      render: yaml
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried instead?
+      description: A workaround, or a script after the step.

@@ -1,0 +1,76 @@
+name: Unexpected result or confusing output
+description: The action behaved in a way you did not expect, or the output was hard to read or interpret.
+title: "[unexpected] <short summary>"
+labels: ["unexpected"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Something ran, and the result was not what you anticipated. This is **not** a claim
+        that Reliastra was wrong about the target — it is about the action's behaviour,
+        presentation, or a gap between what it says and what you understood.
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: I expected exit 0 because our requests were fine.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+      placeholder: It exited 5 with "Matched: down".
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Step configuration
+      render: yaml
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of unexpected?
+      options:
+        - Exit code did not match the documented table
+        - Output was hard to read or ambiguous
+        - A state or field was missing from the summary
+        - The gate fired when I expected it not to
+        - The gate did not fire when I expected it to
+        - Rendered incorrectly in the summary
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: render-context
+    attributes:
+      label: Where did you see this?
+      description: Runner log, job summary, annotation, JSON output.
+      options:
+        - Runner log
+        - Job summary
+        - Workflow annotation
+        - JSON output
+        - Local run
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Full output
+      render: text
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why did this matter?
+      description: Did it break a pipeline, cause a bad deploy decision, waste an hour? Context shapes the fix.

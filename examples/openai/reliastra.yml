@@ -1,0 +1,32 @@
+name: Gate on several vendors with a matrix
+
+# One gate across a set of vendors. A matrix keeps each vendor's result
+# separate in the checks UI, so you can see exactly which one broke instead of
+# a single red X that tells you nothing.
+#
+# `max-parallel` is left alone deliberately: independence is the point.
+# Reliastra observing four vendors at once is not four opinions about one vendor.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vendors:
+    name: ${{ matrix.vendor }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # one vendor being down should not hide the others
+      matrix:
+        vendor: [openai, auth0, cloudflare, twilio]
+    steps:
+      - uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: ${{ matrix.vendor }}
+          # Strict: a quiet feed is not accepted as an answer here, because this
+          # job exists purely to tell you something is wrong.
+          fail-on: down,unverified

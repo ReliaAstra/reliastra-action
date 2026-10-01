@@ -1,0 +1,43 @@
+name: Go service CI
+
+# The same idea as the FastAPI example in Go. The gate uses the package latency
+# budget declared in internal/stripe/client.go so the SLO lives in code and the
+# workflow does not hardcode a second, drifting copy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Test and verify the upstream dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Test
+        run: go test -race ./...
+
+      - name: Read the latency budget from source
+        id: budget
+        # One number, one home. Changing the SLO changes the gate.
+        run: |
+          MS=$(grep -oE 'LatencyBudgetMS = [0-9]+' internal/stripe/client.go | grep -oE '[0-9]+')
+          echo "ms=$MS" >> "$GITHUB_OUTPUT"
+          echo "Latency budget is ${MS}ms"
+
+      - name: Reliastra dependency check
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: stripe
+          token: ${{ secrets.RELIASTRA_TOKEN }}
+          fail-on: degraded,down
+          latency-threshold-ms: ${{ steps.budget.outputs.ms }}

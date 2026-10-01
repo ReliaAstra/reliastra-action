@@ -1,0 +1,64 @@
+name: Methodology challenge
+description: You believe the detection, attribution, or confirmation logic reached the wrong conclusion. This is taken seriously.
+title: "[methodology] <the claim you think is wrong>"
+labels: ["methodology", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reliastra publishes its method so it can be challenged. The full documentation is at
+        [reliastra.com/docs/methodology](https://reliastra.com/docs/methodology).
+
+        A strong challenge names the **specific step** in the chain that you believe is
+        unsound, and what evidence would settle it. "I don't believe attribution" is not yet
+        a challenge; "the weighted score treats correlation as causation under this input
+        distribution" is.
+
+  - type: textarea
+    id: claim
+    attributes:
+      label: Which specific claim or step do you dispute?
+      placeholder: |
+        The step that attributes a failure to the vendor rather than to our own network.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which stage?
+      options:
+        - Detection (confirming a failure)
+        - Resolution (clearing a failure)
+        - Attribution (assigning cause)
+        - Evidence generation or hashing
+        - Observation cadence or scheduling
+        - Quorum or confirmation logic
+        - The published limitations
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reasoning
+    attributes:
+      label: Why do you believe it is unsound?
+      description: Reasoning, not conclusion. What follows from the current method that should not?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What evidence would settle this?
+      description: A dataset, a reproducible case, a falsification test.
+      placeholder: |
+        A public incident where latency was flat but the vendor was not at fault.
+    validations:
+      required: true
+
+  - type: textarea
+    id: prior-art
+    attributes:
+      label: Prior art or references
+      description: Links to SRE literature, postmortems, or standards that bear on this.

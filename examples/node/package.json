@@ -1,0 +1,12 @@
+{
+  "name": "charge-service-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Example Node service. Its CI gates on an independent Reliastra observation of its upstream dependency.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {}
+}

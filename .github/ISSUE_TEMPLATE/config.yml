@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Methodology and detection documentation
+    url: https://reliastra.com/docs/methodology
+    about: Read the method before challenging it. Specific challenges are better than general doubts.
+  - name: Public observatory
+    url: https://reliastra.com/observatory
+    about: See what Reliastra has actually observed, with evidence, before filing a mismatch.
+  - name: Reliastra CLI and main repository
+    url: https://github.com/ReliaAstra/Reliastra
+    about: Capability that belongs to the product rather than to this action belongs here.

@@ -1,0 +1,23 @@
+# Force LF everywhere. A committed dist/index.js with CRLF line endings still
+# runs, but a workflow YAML with CRLF breaks in confusing ways on Linux runners,
+# and a JS bundle with CRLF is noise in every diff.
+* text=auto eol=lf
+
+*.js   text eol=lf
+*.mjs  text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.go   text eol=lf
+*.py   text eol=lf
+*.txt  text eol=lf
+
+# Never rewrite these.
+LICENSE       text eol=lf
+dist/index.js text eol=lf
+
+*.png  binary
+*.gif  binary
+*.ico  binary
+*.woff binary

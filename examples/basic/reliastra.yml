@@ -1,0 +1,25 @@
+name: Reliastra basic
+
+# The smallest useful setup. No credentials, no account, no secrets.
+# Reads the public incident feed for Stripe.
+#
+# Exit codes: 0 ok / 1 usage / 2 api / 3 auth / 4 unverified / 5 denied / 6 network
+# Public mode exits 0 when the feed is quiet, and 5 when an incident is open.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check Stripe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: stripe
+          fail-on: down

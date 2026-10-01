@@ -1,0 +1,144 @@
+name: "Reliastra Dependency Check"
+description: "Independently observe an external API dependency, confirm failures deterministically, and fail your CI with evidence instead of guesswork."
+author: "Emmanuel Adeshina <e.adeshina@proton.me>"
+
+branding:
+  icon: "activity"
+  color: "cyan"
+
+inputs:
+  dependency:
+    description: >-
+      Dependency UUID when `token` is supplied (authenticated mode), or a vendor
+      slug such as `stripe`, `openai` or `cloudflare` when no token is supplied
+      (public incident feed mode).
+    required: true
+
+  token:
+    description: >-
+      Reliastra API key, sent as X-API-Key. Keys begin with `rel_`. Store it as
+      a repository secret. Omit it to read the public incident feed instead,
+      which needs no credentials but cannot observe your private dependencies.
+    required: false
+
+  fail-on:
+    description: >-
+      Which observations fail the job. Comma-separated, or `any` (everything
+      except `up`), or `never` (status alone never fails).
+      One of: up, degraded, down, blocked, unverified, pipeline-error, stale.
+      An observation that is `degraded` because it met or exceeded a latency
+      threshold is derived by this action, not a Reliastra status.
+    required: false
+    default: "down"
+
+  base-url:
+    description: "Reliastra API root. Change only if you are self-hosting."
+    required: false
+    default: "https://reliastra.com/api"
+
+  wait-seconds:
+    description: >-
+      Seconds to wait for a settled observation before reporting the last known
+      state. `0` reports immediately. Reliastra probes on its own cadence
+      (typically 300s), so waiting rarely produces a fresher reading.
+    required: false
+    default: "0"
+
+  timeout-seconds:
+    description: "Per-request HTTP timeout. Network failures exit 6."
+    required: false
+    default: "30"
+
+  retries:
+    description: "Extra attempts for transient failures: network errors, 429 and 5xx."
+    required: false
+    default: "2"
+
+  history-limit:
+    description: "Number of past observations to fetch for the time-series display."
+    required: false
+    default: "40"
+
+  latency-threshold-ms:
+    description: >-
+      Latency in milliseconds at or above which a successful observation is
+      reported as `degraded`. Overrides the dependency's own alert threshold.
+      Leave empty to use `alert_threshold_ms` from the dependency, and to
+      disable `degraded` entirely when neither is set.
+    required: false
+
+  incident-status:
+    description: "Public mode only. Filter the incident feed: all, open or resolved."
+    required: false
+    default: "all"
+
+  result-format:
+    description: "`text` for the human report, `json` to also print a machine-readable record."
+    required: false
+    default: "text"
+
+  output-file:
+    description: >-
+      Write the machine-readable record to this path in the workspace, e.g.
+      `reliastra.json`, so a later step can upload or diff it. Implies the JSON
+      payload. A write failure is a warning, never a failed check.
+    required: false
+
+  annotate:
+    description: "Add a GitHub workflow annotation to the job."
+    required: false
+    default: "true"
+
+outputs:
+  verdict:
+    description: "up, degraded, down, blocked, unverified or pipeline-error."
+  status:
+    description: "Alias of `verdict`."
+  exit-code:
+    description: "0 ok · 1 usage · 2 api · 3 auth · 4 unverified · 5 denied · 6 network · 130 cancelled."
+  degraded:
+    description: "True when `verdict` is degraded. Derived by this action, not a Reliastra status."
+  stale:
+    description: "True when the last observation is older than its expected cadence."
+  latency-ms:
+    description: "Latency of the last observation."
+  http-status:
+    description: "HTTP status code observed, or empty."
+  observed-at:
+    description: "Timestamp of the observation, ISO 8601 UTC."
+  observation-point:
+    description: "Observation point label, e.g. us-east. This is one label, not corroboration."
+  observation-points:
+    description: "Always 1. Reliastra runs a single observation point."
+  pipeline-state:
+    description: "Raw CheckState from the API, e.g. successful, target_failed, blocked_by_security_policy."
+  methodology-version:
+    description: "Methodology version supporting the observation."
+  evidence-url:
+    description: "Link to the evidence record for the incident, if any."
+  incident-id:
+    description: "Incident UUID for the reported incident, if any."
+  attribution-status:
+    description: "Attribution label, e.g. vendor_failure. A weighted score, not proof of cause."
+  evidence-hash:
+    description: "SHA-256 of the published evidence artifact."
+  matched:
+    description: "Comma-separated fail-on conditions this observation matched."
+  mode:
+    description: "authenticated or public."
+  series-count:
+    description: "Number of historical observations fetched."
+  series-failures:
+    description: "How many of those observations failed."
+  series-latencies:
+    description: "Comma-separated latencies, oldest first, for charting."
+  series-outcomes:
+    description: "Comma-separated up/down per observation, oldest first."
+  summary:
+    description: "The rendered job summary as markdown."
+  error:
+    description: "Error message when the check could not complete."
+
+runs:
+  using: "node20"
+  main: "dist/index.js"

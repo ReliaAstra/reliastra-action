@@ -1,0 +1,39 @@
+{
+  "name": "reliastra-action",
+  "version": "1.0.0",
+  "description": "Independently observe external API dependencies, confirm failures, and fail your CI deterministically.",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.js",
+    "all": "npm run build && npm test",
+    "prepublishOnly": "npm run all"
+  },
+  "keywords": [
+    "github-actions",
+    "api-monitoring",
+    "dependency-monitoring",
+    "observability",
+    "sre",
+    "incident-response",
+    "api-reliability"
+  ],
+  "author": "Emmanuel Adeshina <e.adeshina@proton.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReliaAstra/reliastra-action.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ReliaAstra/reliastra-action/issues"
+  },
+  "homepage": "https://reliastra.com",
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "0.25.0"
+  }
+}

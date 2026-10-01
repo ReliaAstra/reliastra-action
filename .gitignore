@@ -1,0 +1,14 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+coverage/
+*.tsbuildinfo
+
+# Dist is deliberately NOT ignored.
+# GitHub recommends committing the compiled action so consumers never have to
+# build it. CI verifies dist/ matches src/, so a stale bundle fails the build
+# rather than shipping.

@@ -1,0 +1,50 @@
+name: Branch on outputs instead of the exit code
+
+# `continue-on-error` plus branching on outputs is often more useful than
+# letting the step fail. You decide what a `down` verdict means for YOUR
+# pipeline: block a deploy, page someone, or just annotate.
+#
+# This pattern also lets you distinguish the three outcomes that all mean
+# "non-zero exit": a confirmed vendor failure, a problem with our own token,
+# and a network failure. Only the first one is about the vendor.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  triage:
+    name: Triage Auth0
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reliastra dependency check
+        id: reliastra
+        continue-on-error: true # we triage, we do not just crash
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: auth0
+          fail-on: down
+          output-file: reliastra.json
+
+      - name: Confirmed vendor failure
+        if: steps.reliastra.outputs.verdict == 'down'
+        run: |
+          echo "::error::Auth0 has a confirmed open incident: ${{ steps.reliastra.outputs.incident-id }}"
+          echo "Severity context is in the job summary."
+          echo "Evidence: ${{ steps.reliastra.outputs.evidence-url }}"
+          exit 1
+
+      - name: Could not complete the check at all
+        if: steps.reliastra.outputs.verdict == 'error'
+        run: |
+          echo "::warning::Reliastra could not complete: ${{ steps.reliastra.outputs.error }}"
+          echo "This says NOTHING about Auth0. Exit code was ${{ steps.reliastra.outputs.exit-code }}."
+          echo "3 = token rejected, 6 = network, 2 = API error. See the summary."
+
+      - name: No open incident
+        if: steps.reliastra.outputs.verdict != 'down' && steps.reliastra.outputs.verdict != 'error'
+        run: echo "No open incident on the public record. Proceeding."

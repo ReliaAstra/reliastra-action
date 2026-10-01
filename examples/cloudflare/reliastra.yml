@@ -1,0 +1,75 @@
+name: Chart the observation series yourself
+
+# The action renders the series for humans. This example shows the machine
+# path: `series-latencies` and `series-outcomes` are oldest-first CSV, ready to
+# be plotted, diffed, or written to a dashboard.
+#
+# Authenticated mode only: the public incident feed reports incidents, not a
+# per-observation series, so these outputs are empty in public mode.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  series:
+    name: Record Cloudflare observations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reliastra dependency check
+        id: reliastra
+        continue-on-error: true
+        uses: ReliaAstra/reliastra-action@v1
+        with:
+          dependency: cloudflare
+          token: ${{ secrets.RELIASTRA_TOKEN }}
+          fail-on: degraded,down
+          latency-threshold-ms: 800
+          output-file: reliastra.json
+
+      - name: Plot the series
+        if: always() && steps.reliastra.outputs.series-count != '0'
+        run: |
+          python3 - <<'PY'
+          import csv, json, os, sys
+
+          latencies = [float(v) for v in os.environ["LATENCIES"].split(",") if v]
+          outcomes  = os.environ["OUTCOMES"].split(",")
+
+          if not latencies:
+              print("no samples yet")
+              sys.exit(0)
+
+          width = 60
+          print(f"{len(latencies)} observations, {outcomes.count('down')} failed")
+          for row in csv.writer(sys.stdout):
+              row.writerow(["latency_ms", "outcome"])
+
+          # Oldest left, newest right, matching how the summary renders it.
+          bars = "".join("v" if o == "up" else "^" for o in outcomes)
+          print("\noutcomes (oldest -> newest)")
+          print(bars)
+
+          lo, hi = min(latencies), max(latencies)
+          span = (hi - lo) or 1
+          spark = "".join(
+              " .:-=+*#%@"[min(9, int((v - lo) / span * 9))] for v in latencies
+          )
+          print(f"\nlatency {lo:.0f}-{hi:.0f} ms")
+          print(spark)
+          PY
+        env:
+          LATENCIES: ${{ steps.reliastra.outputs.series-latencies }}
+          OUTCOMES: ${{ steps.reliastra.outputs.series-outcomes }}
+
+      - name: Upload the raw record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliastra-record
+          path: reliastra.json
+          retention-days: 30
